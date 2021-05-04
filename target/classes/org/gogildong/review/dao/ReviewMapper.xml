@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gogildong.review.dao.ReviewMapper">
+
+<select id="getList" resultType="Review">
+<![CDATA[
+    select * from ( select /*+INDEX_DESC(tbl_reivew pk_review) */
+  						 rownum rn, rno, sno, mid, context,
+  						 score,img,regdate,updateDate
+  						 from tbl_review
+  						 where sno = #{sno}
+  						  and ROWNUM <= (#{page} * #{perSheet})
+  						 )
+where rn > (#{page}-1) * #{perSheet}
+  ]]>
+</select>
+
+<delete id="delete">
+<![CDATA[
+  delete from tbl_review where rno = #{rno}
+  ]]>
+</delete>
+
+<insert id="insert">
+<![CDATA[
+  insert into tbl_review(rno,sno,mid,context,img,score)
+  values (seq_review.nextval, #{sno}, #{mid}, #{context}, #{img}, #{score})
+  ]]>
+</insert>
+
+<update id="update">
+<![CDATA[
+update from tbl_review set context=#{context}, score=#{score}, img=#{img}
+ ]]>
+</update>
+
+<select id="getOne" resultType="Review">
+<![CDATA[
+select * from tbl_review where rno = #{rno}
+ ]]>
+
+</select>
+
+<select id="getValue" resultType="int">
+<![CDATA[
+select value from tbl_like where rno=#{rno} and mid=#{mid}
+]]>
+</select>
+
+	
+	<!-- 좋아요 -->
+	
+	<insert id="insertLike">
+	<![CDATA[
+		insert into TBL_LIKE(RNO, MID)
+		VALUES (
+       	#{rno}, #{mid}
+       	)
+	]]>
+	</insert>
+	
+	<update id="updateLike">
+     <![CDATA[
+   		update TBL_LIKE set VALUE =1, UPDATEDATE = sysdate where MID = #{mid} and rno = #{rno}
+     ]]>
+	</update>
+
+	<update id="disLike">
+     <![CDATA[
+   		update TBL_LIKE set VALUE =0, UPDATEDATE = sysdate where MID = #{mid} and rno = #{rno}
+     ]]>
+	</update>
+	
+	<select id="selectlike" resultType="Like">
+	select * from tbl_like where rno = #{rno} and mid = #{mid}
+	</select>
+	
+	<select id="getTotal" resultType="int">
+	<![CDATA[
+	select count(rno) from tbl_review where sno = #{sno}
+	]]>
+	</select>
+	
+	
+</mapper>

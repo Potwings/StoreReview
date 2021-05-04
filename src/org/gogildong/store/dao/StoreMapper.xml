@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.gogildong.store.dao.StoreMapper">
+
+<select id="getList" resultType="Store">
+  <![CDATA[
+  select * from ( select /*+INDEX_DESC(tbl_store pk_store) */
+  						 rownum rn, sno, name, address, lat,
+  						 lng, regdate, updateDate, rcount
+  						 from tbl_store
+  						 where sno>0
+  						  and ROWNUM <= (#{page} * #{perSheet})
+  						 )
+where rn > (#{page}-1) * #{perSheet}
+  ]]>
+</select>
+
+<select id="getOne" resultType="Store">
+select * from tbl_store where sno = #{sno}
+</select>
+
+<select id="getCount" resultType="int">
+
+select count(sno) from tbl_store
+
+
+</select>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>
